@@ -455,8 +455,8 @@ if start_training:
             with cols[idx]:
                 fig_heatmap_acc = go.Figure(data=go.Heatmap(
                     z=data['results_grid'],
-                    x=[f"{lr:.4f}" for lr in learning_rates_grid],
-                    y=[f"{bs}" for bs in batch_sizes_grid],
+                    x=learning_rates_grid,
+                    y=batch_sizes_grid,
                     colorscale='Viridis',
                     text=np.round(data['results_grid'], 4),
                     texttemplate='%{text}',
@@ -467,9 +467,19 @@ if start_training:
                     title=f"{opt_type}",
                     xaxis_title="LR",
                     yaxis_title="BS",
+                    xaxis=dict(
+                        tickmode='array',
+                        tickvals=learning_rates_grid,
+                        ticktext=[f"{lr:.4f}" for lr in learning_rates_grid]
+                    ),
+                    yaxis=dict(
+                        tickmode='array',
+                        tickvals=batch_sizes_grid,
+                        ticktext=[f"{bs}" for bs in batch_sizes_grid]
+                    ),
                     height=350
                 )
-                st.plotly_chart(fig_heatmap_acc, use_container_width=True)
+                st.plotly_chart(fig_heatmap_acc)
         
         # Convergence speed heatmaps
         st.markdown("**Vitesse de Convergence (95%)**")
@@ -478,8 +488,8 @@ if start_training:
             with cols[idx]:
                 fig_heatmap_conv = go.Figure(data=go.Heatmap(
                     z=data['convergence_grid'],
-                    x=[f"{lr:.4f}" for lr in learning_rates_grid],
-                    y=[f"{bs}" for bs in batch_sizes_grid],
+                    x=learning_rates_grid,
+                    y=batch_sizes_grid,
                     colorscale='RdYlGn_r',
                     text=np.round(data['convergence_grid'], 0).astype(int),
                     texttemplate='%{text}',
@@ -490,9 +500,19 @@ if start_training:
                     title=f"{opt_type}",
                     xaxis_title="LR",
                     yaxis_title="BS",
+                    xaxis=dict(
+                        tickmode='array',
+                        tickvals=learning_rates_grid,
+                        ticktext=[f"{lr:.4f}" for lr in learning_rates_grid]
+                    ),
+                    yaxis=dict(
+                        tickmode='array',
+                        tickvals=batch_sizes_grid,
+                        ticktext=[f"{bs}" for bs in batch_sizes_grid]
+                    ),
                     height=350
                 )
-                st.plotly_chart(fig_heatmap_conv, use_container_width=True)
+                st.plotly_chart(fig_heatmap_conv)
         
         # 3D Surfaces - Side by side
         st.markdown("### 📊 Surfaces 3D de Performance")
@@ -514,11 +534,21 @@ if start_training:
                         xaxis_title="LR",
                         yaxis_title="BS",
                         zaxis_title="Accuracy",
-                        xaxis_type="log"
+                        xaxis=dict(
+                            type="log",
+                            tickmode='array',
+                            tickvals=learning_rates_grid,
+                            ticktext=[f"{lr:.4f}" for lr in learning_rates_grid]
+                        ),
+                        yaxis=dict(
+                            tickmode='array',
+                            tickvals=batch_sizes_grid,
+                            ticktext=[f"{bs}" for bs in batch_sizes_grid]
+                        )
                     ),
                     height=500
                 )
-                st.plotly_chart(fig_3d, use_container_width=True)
+                st.plotly_chart(fig_3d)
         
         # Detailed comparison - best config per optimizer
         st.markdown("### 📈 Comparaison des Meilleures Configurations par Optimiseur")
@@ -637,7 +667,7 @@ if start_training:
                 showlegend=False,
                 height=400
             )
-            st.plotly_chart(fig_variance, use_container_width=True)
+            st.plotly_chart(fig_variance)
             st.caption("Plus l'écart-type est faible, moins l'optimiseur est sensible aux hyperparamètres")
         
         with col2:
@@ -663,7 +693,7 @@ if start_training:
                 showlegend=False,
                 height=400
             )
-            st.plotly_chart(fig_avg, use_container_width=True)
+            st.plotly_chart(fig_avg)
             st.caption("Performance moyenne sur toutes les combinaisons de hyperparamètres")
         
         st.success("✅ Analyse de sensibilité terminée !")
@@ -976,8 +1006,7 @@ if start_training:
                 'Val Loss': f"{res['final_val_loss']:.4f}",
                 'F1 Score': f"{res['test_f1s'][-1]:.4f}",
                 'Convergence (95%)': f"{res['convergence_speed_95']} époques",
-                'Convergence (99%)': f"{res['convergence_speed_99']} époques",
-                'Converged': '✅' if res['converged'] else '❌'
+                'Convergence (99%)': f"{res['convergence_speed_99']} époques"
             })
         
         st.dataframe(pd.DataFrame(summary_data), use_container_width=True)
